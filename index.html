@@ -12,7 +12,7 @@
 </head>
 <body>
     <header>
-        <nav>
+        <nav id="top">
             <ul>
                 <div>
                     <a href="index.html"><img src="img/console.svg" alt=""></a>
@@ -38,21 +38,39 @@
         <div class="hero-image">
             <div class="hero-text">
                 <h1>Escape room</h1>
-                <button>Lees meer</button>
+                <a class="button" onclick="location.href='#info'">Lees meer</a>
             </div>
         </div>
-        <div class="content">
-            <p>Hier komt een verhaal</p>
+        <div class="content" id="info">
+            <div class="content-text">
+                <h2>Het verhaal</h2>
+                <div>
+                    <p>De escape room is gesitueerd in een arcade, je bent met je vrienden games aan het spelen en plots wordt je volledig ingesloten in de arcade.</p>
+                </div>
+                <div>
+                    <p>Om buiten te geraken moet je alle puzzels voltooien zoals een memory spel, zien dat je genoeg binnenlaat op een sensor, een doolhof voltooien en als laatste het slot van de deur kraken zodat je naar buiten kan.</p>
+                </div>
+                
+            </div>
         </div>
-        <div>
-            <a href="arno.html">Arno Boenders</a>
-            <a href="brent.html">Brent Selis</a>
-            <a href="syme.html">Syme Vandenbosch</a>
-            <a href="warre.html">Warre Govaert</a>
+        
+        <div class="personen-container">
+            <div class="personen-content">
+                <h2>Creators</h2>
+                <div class="personen">
+                    <a href="arno.html"><p>Arno Boenders</p></a>                
+                    <a href="brent.html"><p>Brent Selis</p></a>                        
+                    <a href="syme.html"><p>Syme Vandenbosch</p></a>
+                    <a href="warre.html"><p>Warre Govaert</p></a>
+                </div>
+                <div>
+                    <a class="button" href="#top">Back to top</a>
+                </div>
+                
+            </div>            
         </div>
-    </main>
-    <footer>
 
-    </footer>
+        
+    </main>
 </body>
 </html>

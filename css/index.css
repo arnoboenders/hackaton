@@ -1,6 +1,4 @@
 
-
-
 .hero-image {
     background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("../img/Arcade1.jpg");
     height: 50em;
@@ -8,6 +6,7 @@
     background-repeat: no-repeat;
     background-size: cover;
     position: relative;
+    
   }
   
   .hero-text {
@@ -19,19 +18,84 @@
     color: white;
   }
   
-  .hero-text button {
-      margin-top: 1em;
+  .button {
+    margin-top: 1em;
     border: none;
     outline: 0;
     display: inline-block;
     padding: 10px 25px;
     color: black;
     background-color: #ddd;
+    text-decoration: none;
     text-align: center;
     cursor: pointer;
+    
   }
   
-  .hero-text button:hover {
+  .button:hover {
     background-color: #555;
     color: white;
   }
+  .content{
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("../img/Arcade3.jpg");
+    height: 50em;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: relative;
+    
+  }
+  .content-text h2{
+    margin-bottom: 1.5em;
+  }
+  .content-text{
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    width: 50%;
+    font-size: 1.5em;
+  }
+  .content-text p{
+    margin-bottom: 1.5em;
+  }
+
+
+  .personen-container{
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("../img/Arcade2.jpg");;
+    height: 50em;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: relative;
+  }
+  .personen-content{
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+  }
+  .personen{
+    display: flex;
+  }
+  .personen a{
+    text-decoration: none;
+  }
+  .personen-content p{
+    font-size: 1.8em;
+    color: white;
+    margin-right: 1em;
+    transition: all 0.3s ease-in-out;
+  }
+  .personen-content h2{
+    margin-bottom: 1em;
+    font-size: 3em;
+  }
+.personen-content p:hover{
+  transform: scale(1.1);
+}
+
