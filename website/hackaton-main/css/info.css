@@ -1,0 +1,7 @@
+.content-text div{
+    display: flex;
+    flex-direction: row;
+}
+.content-text{
+    width: 70%;
+}

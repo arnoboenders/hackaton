@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arno details</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/header&footer.css">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/info.css">
+</head>
+<body>
+<header>
+    <nav id="top">
+        <ul>
+            <div>
+                <a href="index.html"><img src="img/console.svg" alt=""></a>
+            </div>
+            <div class="nav-list">
+                <li><a href="index.html">Home</a></li>
+                <div class="dropdown">
+                    <button class="dropbtn">Creators</button>
+                    <div class="dropdown-content">
+                        <a href="arno.html">Arno Boenders</a>
+                        <a href="brent.html">Brent Selis</a>
+                        <a href="syme.html">Syme Vandenbosch</a>
+                        <a href="warre.html">Warre Govaert</a>
+                    </div>
+                </div>
+            </div>
+        </ul>
+    </nav>
+</header>
+<main>
+    <div class="hero-image">
+        <div class="hero-text">
+            <h1>Afstands game (Arno Boenders)</h1>
+            <p>Je moet een lichsource op de juiste afstand houden  Er wordt een random waarde gekozen (er zullen er rond de 5 zijn waaruit gekozen wordt) en het is de bedoeling dat de speler de lightsource op de juiste afstand zet. Als het de juiste afstand is dan brand er een lampje blauw. Het zal met een interval timer gaan dat dit niet supersnel klaar is dus ongeveer 2 seconde tussen elke scan. Dan wordt na een 5-tal keer dit te doen een random getal gegeven via een 7-segment display</p>
+            <a class="button" onclick="location.href='#info'">Lees meer</a>
+        </div>
+    </div>
+    <div class="content" id="info">
+        <div class="content-text">
+            <h2>BlokSchema & Code</h2>
+            <div>
+                <img src="./img/Opbouw_arn.png" alt="Foto opbouw afstands game" width="800" height="400">
+                <textarea cols="97" rows="5" style="overflow:auto;">#include "SevSeg.h"
+int fotoTransistor = A0;
+int LED[] = {A1,A2,A3,A4,9,10};
+int startPin = 11;
+int teller = 0;
+int tellerGewonnen = 0;
+int randomNumber1;
+int randomNumber2;
+int randomNumber3;
+int randomNumber4;
+int randomNumber5;
+int randomGetal;
+int doorstuurPin = 10;
+SevSeg sevseg;
+void setup() {
+  byte numDigits = 1;
+  byte digitPins[] = {};
+  byte segmentPins[] = {2, 3, 4, 5, 6, 7, 8};
+  bool resistorsOnSegments = true;
+
+  byte hardwareConfig = COMMON_ANODE;
+  sevseg.begin(hardwareConfig, numDigits, digitPins, segmentPins, resistorsOnSegments);
+  sevseg.setBrightness(100);
+  Serial.begin(9600);
+  pinMode(fotoTransistor, INPUT);
+  pinMode(LED[0], OUTPUT);
+  pinMode(LED[1], OUTPUT);
+  pinMode(LED[2], OUTPUT);
+  pinMode(LED[3], OUTPUT);
+  pinMode(LED[4], OUTPUT);
+  pinMode(LED[5], OUTPUT);
+  pinMode(doorstuurPin, OUTPUT);
+  pinMode(segmentPins[0], OUTPUT);
+  pinMode(segmentPins[1], OUTPUT);
+  pinMode(segmentPins[2], OUTPUT);
+  pinMode(segmentPins[3], OUTPUT);
+  pinMode(segmentPins[4], OUTPUT);
+  pinMode(segmentPins[5], OUTPUT);
+  pinMode(segmentPins[6], OUTPUT);
+  pinMode(segmentPins[7], OUTPUT);
+  //pinMode(startPin, INPUT);
+  randomSeed(analogRead(0));
+  randomGetal = random(1, 9);
+}
+
+int isItCorrect(){
+
+  int value = analogRead(fotoTransistor);
+  Serial.println("Analog value : ");
+  Serial.println(value);
+  delay(2000);
+    if(value > 220){
+    digitalWrite(LED[0], LOW);
+    digitalWrite(LED[1], LOW);
+    digitalWrite(LED[2], LOW);
+    digitalWrite(LED[3], LOW);
+    teller = 4;
+
+  }
+  else if(value <= 220 && value > 180){
+    digitalWrite(LED[0], HIGH);
+    digitalWrite(LED[1], LOW);
+    digitalWrite(LED[2], LOW);
+    digitalWrite(LED[3], LOW);
+    teller = 3;
+
+  }
+  else if(value <= 180 && value > 120){
+    digitalWrite(LED[0], HIGH);
+    digitalWrite(LED[1], HIGH);
+    digitalWrite(LED[2], LOW);
+    digitalWrite(LED[3], LOW);
+    teller = 2;
+
+  }
+  else if(value <= 120 && value > 85){
+    digitalWrite(LED[0], HIGH);
+    digitalWrite(LED[1], HIGH);
+    digitalWrite(LED[2], HIGH);
+    digitalWrite(LED[3], LOW);
+    teller = 1;
+  }
+  else if( value < 75){
+    digitalWrite(LED[0], HIGH);
+    digitalWrite(LED[1], HIGH);
+    digitalWrite(LED[2], HIGH);
+    digitalWrite(LED[3], HIGH);
+    teller = 0;
+  }
+  Serial.println(value);
+  return teller;
+}
+
+void loop() {
+  Serial.println(startPin);
+  delay(2000);
+  if (startPin = HIGH){
+  randomNumber1 = random(1,5);
+  Serial.println(randomNumber1);
+  Serial.println("random getal =");
+  Serial.println(randomGetal);
+ do{
+    digitalWrite(LED[4], LOW);
+  }while(isItCorrect() != randomNumber1);
+  digitalWrite(LED[4], HIGH);
+  randomNumber2 = random(1,5);
+  Serial.println(randomNumber2);
+  delay(3000);
+
+  do{
+    digitalWrite(LED[4], LOW);
+  }while(isItCorrect() != randomNumber2);
+  digitalWrite(LED[4], HIGH);
+  randomNumber3 = random(1,5);
+  Serial.println(randomNumber3);
+  delay(3000);
+
+  do{
+    digitalWrite(LED[4], LOW);
+  }while(isItCorrect() != randomNumber3);
+  digitalWrite(LED[4], HIGH);
+  randomNumber4 = random(1,5);
+  Serial.println(randomNumber4);
+  delay(3000);
+
+  do{
+    digitalWrite(LED[4], LOW);
+  }while(isItCorrect() != randomNumber4);
+  digitalWrite(LED[4], HIGH);
+  randomNumber5 = random(1,5);
+  Serial.println(randomNumber5);
+  delay(3000);
+
+  do{
+    digitalWrite(LED[4], LOW);
+  }while(isItCorrect() != randomNumber5);
+  digitalWrite(LED[4], HIGH);
+  tellerGewonnen = 5;
+  delay(5000);
+
+  if(tellerGewonnen == 5){
+    digitalWrite(LED[0], LOW);
+    digitalWrite(LED[1], LOW);
+    digitalWrite(LED[2], LOW);
+    digitalWrite(LED[3], LOW);
+    digitalWrite(LED[4], LOW);
+    digitalWrite(LED[5], HIGH);
+    for( int i = 0; i < randomGetal; i++){
+      digitalWrite(doorstuurPin, HIGH);
+      Serial.println("high");
+      delay(1000);
+      digitalWrite(doorstuurPin, LOW);
+      Serial.println("low");
+      delay(1000);
+    }
+    sevseg.setNumber(randomGetal);
+    sevseg.refreshDisplay();
+    Serial.println("You won!");
+    exit(0);
+  }
+
+  }
+
+
+}</textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="personen-container">
+        <div class="personen-content">
+            <h2>Flowchart</h2>
+            <div class="personen">
+                <img src="./img/flowchart.png" alt="Foto van de flowchart">
+            </div>
+            <div>
+                <a class="button" href="#top">Back to top</a>
+            </div>
+
+        </div>
+    </div>
+
+
+</main>
+</body>
+</html>

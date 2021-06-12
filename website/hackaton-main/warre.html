@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warre details</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/header&footer.css">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/info.css">
+</head>
+<body>
+<header>
+    <nav id="top">
+        <ul>
+            <div>
+                <a href="index.html"><img src="img/console.svg" alt=""></a>
+            </div>
+            <div class="nav-list">
+                <li><a href="index.html">Home</a></li>
+                <div class="dropdown">
+                    <button class="dropbtn">Creators</button>
+                    <div class="dropdown-content">
+                        <a href="arno.html">Arno Boenders</a>
+                        <a href="brent.html">Brent Selis</a>
+                        <a href="syme.html">Syme Vandenbosch</a>
+                        <a href="warre.html">Warre Govaert</a>
+                    </div>
+                </div>
+            </div>
+        </ul>
+    </nav>
+</header>
+<main>
+    <div class="hero-image">
+        <div class="hero-text">
+            <h1>Code Slot (Warre Govaert)</h1>
+            <p>Een draaislto met potentiometer, dat je dan de potentiemeter op de goede weerstand moet zetten en even laten staan op die weerstand en als dat dan juist is, gaat er 1 van de 4 ledjes aan gaan en zo moet je dan alle leds doen oplichten. En dan komt er op een 7-segment diplay een willekeurig cijfer voor het eindslot.</p>
+            <a class="button" onclick="location.href='#info'">Lees meer</a>
+        </div>
+    </div>
+    <div class="content" id="info">
+        <div class="content-text">
+            <h2>BlokSchema & Code</h2>
+            <div>
+                <img src="./img/Opbouw_warre.png" alt="Foto opbouw code slot" width="800" height="400">
+                <textarea cols="97" rows="5" style="overflow:auto;">#define segA 2
+#define segB 3
+#define segC 4
+#define segD 5
+#define segE 6
+#define segF 7
+#define segG 8
+int led1 = 9;
+int led2 = 10;
+int led3 = 11;
+int led4 = 12;
+int x = 0;
+int knopPin = A1;
+int knopStatus = 0;
+int cijfer1 = A2;
+int cijfer1status = 0;
+int c1 = 0;
+int y1 = 0;
+int cijfer2 = A3;
+int cijfer2status = 0;
+int c2 = 0;
+int y2 = 0;
+int cijfer3 = A4;
+int cijfer3status = 0;
+int c3 = 0;
+int y3 = 0;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(led1, OUTPUT);
+  pinMode(led2, OUTPUT);
+  pinMode(led3, OUTPUT);
+  pinMode(led4, OUTPUT);
+  pinMode(knopPin, INPUT);
+  pinMode(cijfer1, INPUT);
+
+  for (int i=2;i<9;i++){
+    pinMode(i, OUTPUT);
+  }
+}
+
+void loop() {
+  int sensorValue = analogRead(A0);       //Dit deel leest de potentiometer in dat is een getal tussen 0 en 1000 dus ik zorg er dan voor dat dat tussen 0 en 9 is.
+  sensorValue = sensorValue / 100;
+  if (sensorValue > 9){
+    sensorValue = sensorValue - 1;
+  }
+  switch (sensorValue){                   //Hier worden het getal op het 7-segment display gezet.
+    case 0:
+    digitalWrite(segA, HIGH);
+    digitalWrite(segB, HIGH);
+    digitalWrite(segC, HIGH);
+    digitalWrite(segD, HIGH);
+    digitalWrite(segE, HIGH);
+    digitalWrite(segF, HIGH);
+    digitalWrite(segG, LOW);
+    break;
+
+    case 1:
+    digitalWrite(segA, LOW);
+    digitalWrite(segB, HIGH);
+    digitalWrite(segC, HIGH);
+    digitalWrite(segD, LOW);
+    digitalWrite(segE, LOW);
+    digitalWrite(segF, LOW);
+    digitalWrite(segG, LOW);
+    break;
+
+    case 2:
+    digitalWrite(segA, HIGH);
+    digitalWrite(segB, HIGH);
+    digitalWrite(segC, LOW);
+    digitalWrite(segD, HIGH);
+    digitalWrite(segE, HIGH);
+    digitalWrite(segF, LOW);
+    digitalWrite(segG, HIGH);
+    break;
+
+    case 3:
+    digitalWrite(segA, HIGH);
+    digitalWrite(segB, HIGH);
+    digitalWrite(segC, HIGH);
+    digitalWrite(segD, HIGH);
+    digitalWrite(segE, LOW);
+    digitalWrite(segF, LOW);
+    digitalWrite(segG, HIGH);
+    break;
+
+    case 4:
+    digitalWrite(segA, LOW);
+    digitalWrite(segB, HIGH);
+    digitalWrite(segC, HIGH);
+    digitalWrite(segD, LOW);
+    digitalWrite(segE, LOW);
+    digitalWrite(segF, HIGH);
+    digitalWrite(segG, HIGH);
+    break;
+
+    case 5:
+    digitalWrite(segA, HIGH);
+    digitalWrite(segB, LOW);
+    digitalWrite(segC, HIGH);
+    digitalWrite(segD, HIGH);
+    digitalWrite(segE, LOW);
+    digitalWrite(segF, HIGH);
+    digitalWrite(segG, HIGH);
+    break;
+
+    case 6:
+    digitalWrite(segA, HIGH);
+    digitalWrite(segB, LOW);
+    digitalWrite(segC, HIGH);
+    digitalWrite(segD, HIGH);
+    digitalWrite(segE, HIGH);
+    digitalWrite(segF, HIGH);
+    digitalWrite(segG, HIGH);
+    break;
+
+    case 7:
+    digitalWrite(segA, HIGH);
+    digitalWrite(segB, HIGH);
+    digitalWrite(segC, HIGH);
+    digitalWrite(segD, LOW);
+    digitalWrite(segE, LOW);
+    digitalWrite(segF, LOW);
+    digitalWrite(segG, LOW);
+    break;
+
+    case 8:
+    digitalWrite(segA, HIGH);
+    digitalWrite(segB, HIGH);
+    digitalWrite(segC, HIGH);
+    digitalWrite(segD, HIGH);
+    digitalWrite(segE, HIGH);
+    digitalWrite(segF, HIGH);
+    digitalWrite(segG, HIGH);
+    break;
+
+    case 9:
+    digitalWrite(segA, HIGH);
+    digitalWrite(segB, HIGH);
+    digitalWrite(segC, HIGH);
+    digitalWrite(segD, HIGH);
+    digitalWrite(segE, LOW);
+    digitalWrite(segF, HIGH);
+    digitalWrite(segG, HIGH);
+    break;
+  }
+
+  delay(1000);
+  knopStatus = digitalRead(knopPin);
+  if (sensorValue == c1 && (x == 0) && (knopStatus == HIGH)){         //Dit is voor de getallen van de code te controlleren of het klopt en dan ook de bijhorende led aan te zetten.
+    digitalWrite(led1, HIGH);
+    x = x + 1;
+  }
+
+  if (sensorValue == c2 && (x == 1) && (knopStatus == HIGH)){
+    digitalWrite(led2, HIGH);
+    x = x + 1;
+  }
+
+  if (sensorValue == c3 && (x == 2) && (knopStatus == HIGH)){
+    digitalWrite(led3, HIGH);
+    x = x + 1;
+  }
+
+  if (x==3){
+    digitalWrite(led4, HIGH);                                        //Dit duid aan dat de code volledig is.
+  }
+
+  cijfer1status = digitalRead(cijfer1);                              //Dit leest de getallen die binnen komen voor de code aan de hand van pulsen die worden getelt.
+  cijfer2status = digitalRead(cijfer2);
+  cijfer3status = digitalRead(cijfer3);
+
+  if (cijfer1status == HIGH){
+    if (cijfer1status == HIGH && (y1=0)){
+      delay(2500);
+      c1 = 0;
+      y1 = y1 + 1;
+    }
+    c1 = c1 + 1;
+    Serial.println(c1);
+    while (cijfer1status == HIGH){
+      cijfer1status = digitalRead(cijfer1);
+    }
+  }
+
+  if (cijfer2status == HIGH){
+    c2 = c2 + 1;
+    Serial.println(c2);
+    while (cijfer2status == HIGH){
+      cijfer2status = digitalRead(cijfer2);
+    }
+  }
+
+  if (cijfer3status == HIGH){
+    if (cijfer3status == HIGH && (y3=0)){
+      delay(2500);
+      c3 = 0;
+      y3 = y3 + 1;
+    }
+    c3 = c3 + 1;
+    Serial.println(c3);
+    while (cijfer3status == HIGH){
+      cijfer3status = digitalRead(cijfer3);
+    }
+  }
+}
+
+                //Code voor wifikit
+                //**************************************************************//
+//  Name    : WIFI-kit felicitatie                              //
+//  Author  : Syme Vandenbosch                                  //
+//  Date    : 2021 06 08                                        //
+//  Bron    : https://robotzero.one/heltec-wifi-kit-8/          //
+//            aangepast door Syme Vandenbosch zodat toepasbaar  //
+//            is in het project escaperoom (Hackaton)2020-2021  //
+//**************************************************************//
+
+#include <U8g2lib.h>
+
+//U8g2 Contructor
+U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C u8g2(U8G2_R0, 16, 5, 4);
+u8g2_uint_t offset;     // current offset for the scrolling text
+u8g2_uint_t width;      // pixel width of the scrolling text (must be lesser than 128 unless U8G2_16BIT is defined
+
+const int buttonPin = D6;     // the number of the pushbutton pin
+int buttonState = 0;         // variable for reading the pushbutton status
+int enable = 0;
+
+char *text = "PROFICIAT U BENT KUNNEN ONTSNAPPEN!!! "; // scroll this text from right to left
+
+void setup(void) {
+  Serial.begin(9600);
+  u8g2.begin();
+
+  u8g2.setFont(u8g2_font_logisoso32_tf); // set the target font to calculate the pixel width
+  width = u8g2.getUTF8Width(text);    // calculate the pixel width of the text
+  u8g2.setFontMode(0);    // enable transparent mode, which is faster
+
+  pinMode(buttonPin, INPUT);
+}
+
+
+void loop(void) {
+  buttonState = digitalRead(buttonPin);
+  if (buttonState == HIGH) {
+    enable = 1;
+    Serial.println("hoog");
+  }
+  if  (enable == 1) {
+    u8g2_uint_t x;
+
+    u8g2.firstPage();
+    do {
+      //Serial.println("bezig");
+      // draw the scrolling text at current offset
+      x = offset;
+      u8g2.setFont(u8g2_font_logisoso32_tf);   // set the target font
+      do {                // repeated drawing of the scrolling text...
+        u8g2.drawUTF8(x, 32, text);     // draw the scolling text
+        x += width;           // add the pixel width of the scrolling text
+      } while ( x < u8g2.getDisplayWidth() );   // draw again until the complete display is filled
+
+      u8g2.setFont(u8g2_font_logisoso32_tf);   // draw the current pixel width
+      u8g2.setCursor(0, 64);
+      u8g2.print(width);          // this value must be lesser than 128 unless U8G2_16BIT is set
+
+    } while ( u8g2.nextPage() );
+
+    offset -= 1;            // scroll by one pixel
+    if ( (u8g2_uint_t)offset < (u8g2_uint_t) - width )
+      offset = 0;             // start over again
+  }
+}
+</textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="personen-container">
+        <div class="personen-content">
+            <h2>Flowchart</h2>
+            <div class="personen">
+                <img src="./img/flowchart.png" alt="Foto van de flowchart">
+            </div>
+            <div>
+                <a class="button" href="#top">Back to top</a>
+            </div>
+
+        </div>
+    </div>
+
+
+</main>
+</body>
+</html>

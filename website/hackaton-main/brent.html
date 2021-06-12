@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brent details</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/header&footer.css">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/info.css">
+</head>
+<body>
+<header>
+    <nav id="top">
+        <ul>
+            <div>
+                <a href="index.html"><img src="img/console.svg" alt=""></a>
+            </div>
+            <div class="nav-list">
+                <li><a href="index.html">Home</a></li>
+                <div class="dropdown">
+                    <button class="dropbtn">Creators</button>
+                    <div class="dropdown-content">
+                        <a href="arno.html">Arno Boenders</a>
+                        <a href="brent.html">Brent Selis</a>
+                        <a href="syme.html">Syme Vandenbosch</a>
+                        <a href="warre.html">Warre Govaert</a>
+                    </div>
+                </div>
+            </div>
+        </ul>
+    </nav>
+</header>
+<main>
+    <div class="hero-image">
+        <div class="hero-text">
+            <h1>Onthoud Game (Brent Selis)</h1>
+            <p>Een onthoud spel dat er eerste een rgb ledje 1 kleur geeft dan 2 dan … tot 5 kleuren en je moet die allemaal perfect in de juiste volgorde weer ingeven met behulp van een ir remote. Als je een verkeerde combinatie invoert dan gaat de rgb led rood beginnen pinken en dan reset het spel. Als je het spel voltooid hebt en dus elke juiste combinatie hebt gedaan dan gaat de rgb led groen pinken en verschijnt er op het 7 – segmenten display een random gegenereerd cijfer. Dat cijfer ga je later nodig hebben voor het eind code slot. Het willekeurige cijfer wordt dan ook doorgestuurd naar het volgende spel samen met een signaal dat het mag beginnen werken. Zodat alles met elkaar verbonden is.</p>
+            <a class="button" onclick="location.href='#info'">Lees meer</a>
+        </div>
+    </div>
+    <div class="content" id="info">
+        <div class="content-text">
+            <h2>BlokSchema & Code</h2>
+            <div>
+                <img src="./img/Opbouw.PNG" alt="Foto opbouw onthoud game" width="700" height="400">
+                <textarea cols="97" rows="5" style="overflow:auto;">/*
+* Hackaton project
+* Author: Brent Selis
+*
+ */
+
+//Library's toevoegen.
+#include <SevSeg.h>
+#include <IRremote.h>
+
+//Variabele aanmaken.
+SevSeg sevseg;
+const int red_light_pin = 12;
+const int green_light_pin = 13;
+const int blue_light_pin = 11;
+int codePin = 8;
+int startPin = 9;
+const int RECV_PIN = A2;
+IRrecv irrecv(RECV_PIN);
+decode_results results;
+const int colorArray[3][3] = { { 255, 0, 0},
+  { 0, 255, 0},
+  { 0, 0, 255}
+};
+int onthoudArray[5];
+int gekozenArray[5];
+int count = 0;
+int ronde = 0;
+int randomgetal = 0;
+int hoeveelste = 0;
+boolean win = false;
+int juiste = 0;
+byte numDigits = 1;
+byte digitPins[] = {};
+byte segmentPins[] = {7, 6, 5, 4, 3, 2, A0, 0};
+boolean resistorsOnSegments = true;
+byte hardwareConfig = COMMON_ANODE;
+
+//De setup waar ik alles inittialiseer.
+void setup() {
+  //zeven segment library initialiseren en alles goed zetten ervoor.
+  sevseg.begin(hardwareConfig, numDigits, digitPins, segmentPins, resistorsOnSegments);
+  sevseg.setBrightness(100);
+  Serial.begin(9600);
+
+  //output's declareren.
+  pinMode(codePin, OUTPUT);
+  pinMode(startPin, OUTPUT);
+  pinMode(red_light_pin, OUTPUT);
+  pinMode(green_light_pin, OUTPUT);
+  pinMode(blue_light_pin, OUTPUT);
+
+  //Random seed zodat elke keer het andere random waardes geeft.
+  randomSeed(analogRead(1));
+
+  //ir receiver library intialiseren.
+  irrecv.enableIRIn();
+
+  //Het spel starten.
+  game(ronde);
+  delay(500);
+}
+
+//Hier is de loop waar hij blijft kijken naar een signaal van de ir receiver.
+void loop() {
+  //Als er nog niet gewonnen is en er komt een signaal op de irreceiver dan gaat hij dit uitvoeren.
+  if ((win == false) && (irrecv.decode(&results))) {
+      Serial.println(results.value, HEX);
+      irrecv.resume();
+
+      //Als er op de ir remote op het vorige knopje is gedrukt.
+      if (results.value == 0xFF02FD) {
+        if (count == 0) {
+          count = 2;
+        } else {
+          count--;
+        }
+        RGB_color(count); //Gaat de juiste kleur van RGB laten branden.
+        delay(500);
+      }
+      else if (results.value ==  0xFFC23D) { //Als er op de ir remote op de next knop is gedrukt.
+        if (count == 2) {
+          count = 0;
+        } else {
+          count++;
+        }
+        RGB_color(count); //Gaat de juiste kleur van RGB laten branden.
+        delay(500);
+      }
+      else if (results.value == 0xFF22DD) {//Als er op de ir remote op de submit knop is gedrukt.
+        gekozenArray[hoeveelste] = count;//In een array wordt je keuze bijgehouden per ronde.
+        Serial.print(gekozenArray[hoeveelste]);
+        hoeveelste++;//Aantal rondes wordt vergroot.
+        if ((hoeveelste - 1) == ronde) {
+          check();//Methode wordt opgeroepen om te kijken of het juiste ingave was.
+          hoeveelste = 0;//Hoeveelste wordt weer op 0 gezet.
+        }
+        delay(500);
+      }
+  }
+}
+
+//Deze methode wordt gebruikt om de juiste kleur op de RGB led weer te geven.
+void RGB_color(int row)
+{
+  analogWrite(red_light_pin, colorArray[row][0]);
+  analogWrite(green_light_pin, colorArray[row][1]);
+  analogWrite(blue_light_pin, colorArray[row][2]);
+}
+
+//Deze methode wordt gebruikt om echt het spel te spelen. Deze toont dus
+int game(int ronde) {
+  if (ronde <= 4) { //Als het maximum aantal rondes nog niet bereikt is.
+    onthoudArray[ronde] = random(3); //Random nieuwe kleur wordt erin gestoken.
+    for (int i = 0; i <= ronde; i++) {//Toont de verschillende kleuren.
+      RGB_color(onthoudArray[i]);
+      delay(1000);
+      zetAf();//Zet de rgb led weer af
+    }
+  } else {
+    gewonnen();//Als je bent gewonnen dan roept hij de methode gewonnen op.
+  }
+}
+
+//Methode die wordt gebruikt om het kijken of de ingegeven waardes juist zijn.
+boolean check() {
+  for (int i = 0; i <= ronde; i++) {
+    if (gekozenArray[i] == onthoudArray[i]) {//Als de gekoze waarde per stap gelijk is aan de gegenereerde waarde dan zet hij het aantal juiste hoger.
+      juiste++;
+    }
+  }
+  if ((juiste - 1) == ronde) {//Als het aantal juiste gokken gelijk is aan het aantal rondes dan wordt er een nieuwe ronde gestart.
+    ronde++;
+    juiste = 0;
+    zetAf();//Zet ledjes af.
+    game(ronde);//Start een nieuwe ronde.
+  } else {
+    verloren();//Als je een verkeerde gok hebt roept hij de methode verloren op.
+  }
+}
+
+//Methode om de rgb led uit te zetten.
+void zetAf() {
+  analogWrite(red_light_pin, 0); //Geeft rode pin een laag analoog signaal.
+  analogWrite(green_light_pin, 0); //Geeft groene pin een laag analoog signaal.
+  analogWrite(blue_light_pin, 0); //Geeft blauwe pin een laag analoog signaal.
+  delay(500);
+}
+
+//Methode die wordt opgeroepen als je gewonnen bent
+void gewonnen() {
+  win = true;
+  for (int i = 0; i < 10; i++) { //rgb led groen laten pinken.
+    analogWrite(green_light_pin, 255);
+    delay(500);
+    analogWrite(green_light_pin, 0);
+    delay(500);
+  }
+  randomgetal = random(10); //Maakt random getal aan dat kan gebruikt worden bij het eind code slot.
+  sevseg.setNumber(randomgetal, 0);//Zet het random getal op de display.
+  sevseg.refreshDisplay();//Herstart het display.
+  digitalWrite(startPin, HIGH); //Stuurt een signaal dat de volgende puzzel kan starten.
+  delay(2000);
+  digitalWrite(startPin,LOW);
+  for(int i = 0; i < randomgetal; i++){//Stuurt signalen door zodat het eind code slot weet wat het cijfer is.
+    digitalWrite(codePin, HIGH);
+    delay(1000);
+    digitalWrite(codePin, LOW);
+    delay(1000);
+  }
+}
+
+//De methoden die wordt gebruikt voor als je verloren bent.
+void verloren() {
+  analogWrite(red_light_pin, 0);
+  analogWrite(green_light_pin, 0);
+  analogWrite(blue_light_pin, 0);
+  for (int i = 0; i < 10; i++) {//Laat de rgb led rood pinken.
+    analogWrite(red_light_pin, 255);
+    delay(500);
+    analogWrite(red_light_pin, 0);
+    delay(500);
+  }
+  reset();//Roept methode op om alles te resetten.
+  game(ronde);
+  delay(500);
+}
+
+//De methode om alles te resetten.
+void reset() {
+  count = 0;
+  ronde = 0;
+  hoeveelste = 0;
+  win = false;
+  juiste = 0;
+}</textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="personen-container">
+        <div class="personen-content">
+            <h2>Flowchart</h2>
+            <div class="personen">
+                <img src="./img/flowchart.png" alt="Foto van de flowchart">
+            </div>
+            <div>
+                <a class="button" href="#top">Back to top</a>
+            </div>
+
+        </div>
+    </div>
+
+
+</main>
+</body>
+</html>

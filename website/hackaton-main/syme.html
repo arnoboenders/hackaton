@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syme details</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/header&footer.css">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/info.css">
+</head>
+<body>
+<header>
+    <nav id="top">
+        <ul>
+            <div>
+                <a href="index.html"><img src="img/console.svg" alt=""></a>
+            </div>
+            <div class="nav-list">
+                <li><a href="index.html">Home</a></li>
+                <div class="dropdown">
+                    <button class="dropbtn">Creators</button>
+                    <div class="dropdown-content">
+                        <a href="arno.html">Arno Boenders</a>
+                        <a href="brent.html">Brent Selis</a>
+                        <a href="syme.html">Syme Vandenbosch</a>
+                        <a href="warre.html">Warre Govaert</a>
+                    </div>
+                </div>
+            </div>
+        </ul>
+    </nav>
+</header>
+<main>
+    <div class="hero-image">
+        <div class="hero-text">
+            <h1>Doolhof Game (Syme Vandenbosch)</h1>
+            <p>Je hebt een paneel met leds, daarmee zijn 3 drukknopen verbonden. Één voor rechtdoor te stappen, één voor naar links en één voor naar rechts. Bij het startvakje is de led opgelicht en moet je de juist weg zoeken door rechtdoor, links of rechts te stappen. Wanneer je een verkeerde stap doet dan moet je helemaal terug vanaf het begin starten en moest je de weg die je al had dus onthouden. Op het einde wordt er op het paneel een random cijfer getoond voor het codeslot dat nog volgt.<p>
+            <a class="button" onclick="location.href='#info'">Lees meer</a>
+        </div>
+    </div>
+    <div class="content" id="info">
+        <div class="content-text">
+            <h2>BlokSchema & Code</h2>
+            <div>
+                <img src="./img/Opbouw_syme1" alt="Foto opbouw doolhof game" width="700" height="400">
+                <img src="./img/Opboyw_Syme2" alt="Foto opbouw doolhof game" width="700" height="400">
+            </div>
+        </div>
+    </div>
+    <div class="content" id="info1">
+        <div class="content-text">
+            <h2>Code</h2>
+            <div>
+                <textarea cols="200" rows="30" style="overflow:auto;">//**************************************************************//
+//  Name    : Code zoek de juiste weg                           //
+//  Author  : Syme Vandenbosch                                  //
+//  Date    : 2020 06 08                                        //
+//  Version : 1.2                                               //
+//  Bron    : http://www.billporter.info/?p=240                 //
+//            https://github.com/madsci1016/Arduino-PS2X        //
+//            meer info zie PS2_lib.h file                      //
+//  Notes   : PIN AANSLUITINGEN:                                //
+//                              * HC-SR04:                      //
+//                                        - PS2_DAT -- > 11     //
+//                                        - PS2_CMD -- > 9      //
+//                                        - PS2_SEL -- > 8      //
+//                                        - PS2_CLK -- > 10     //
+//                                        - PS2_VCC -- > 5V     //
+//                                        - PS2_GND -- > GND    //
+//                              * 8Ω speaker:                   //
+//                                            - MONO --> 52     //
+//                                            - GND  --> GND    //
+//                                                              //
+//          : DOEL: de juiste weg zoeken vanaf een vertrekpunt  //
+//                  naar een vast eindpunt dit doe je d.m.v. de //
+//                  knoppen op de PS-controller in de juiste    //
+//                  volgorde in te drukken.                     //
+//**************************************************************//
+
+// include de PS2 bibliotheek die zich bevind in de .h bestand en de .cpp bestand
+#include "PS2X_lib.h"
+
+// defineer de pinnen waarop de PS-controller is aangesloten
+#define PS2_DAT        11   //11
+#define PS2_CMD        9    //9
+#define PS2_SEL        8    //8
+#define PS2_CLK        10   //10
+
+// defineer de standen voor de PS-controller
+#define pressures   true
+#define rumble      true
+
+PS2X ps2x;                // maak een PS2X classe
+
+// declareer en initialiseer de variabele voor de PS-controller
+int error = 0;
+byte type = 1;
+byte vibrate = 0;
+
+// leg de pinnen vast om de cijfers te kunnen displayen
+const int NUL[] = {2, 3, 4, 5, 6, 18, 23, 22, 21, 20, 19, 14, 48};
+const int EEN[] = {23, 22, 21, 20, 19, 48, 48, 48, 48, 48, 48, 48, 48};
+const int TWEE[] = {6, 18, 23, 22, 21, 16, 4, 3, 2, 14, 19, 48, 48};
+const int DRIE[] = {6, 18, 23, 22, 21, 16, 4, 20, 19, 14, 2, 48, 48};
+const int VIER[] = {6, 5, 4, 16, 23, 22, 21, 20, 19, 48, 48, 48, 48};
+const int VIJF[] = {23, 18, 6, 5, 4, 16, 21, 20, 19, 14, 2, 48, 48};
+const int ZES[] = {23, 18, 6, 5, 4, 16, 21, 20, 19, 14, 2, 3, 48};
+const int ZEVEN[] = {5, 6, 18, 23, 22, 21, 20, 19, 48, 48, 48, 48, 48};
+const int ACHT[] = {16, 4, 5, 6, 18, 23, 22, 21, 20, 19, 14, 2, 3};
+const int NEGEN[] = {16, 4, 5, 6, 18, 23, 22, 21, 20, 19, 14, 2, 48};
+const int* CIJFERS[] = {NUL, EEN, TWEE, DRIE, VIER, VIJF, ZES, ZEVEN, ACHT, NEGEN};
+
+// leg de pinnen vast van de leds die tijdens het spel de weg zullen vormen
+byte pinnenWeg [] = {2, 3, 4, 16, 15, 20, 28, 29, 21, 22, 30, 38, 37, 36, 35, 40, 41, 42, 43, 44};
+
+// declareer en initialiseer de variabele voor de opstart van het spel
+const int input = 49;
+int inputStand = 0;
+int magWerken = 0;
+
+// declareer en initialiseer de variabele voor tijdens het spel
+int start = 0;
+int vooruit = 0;
+byte fouten = 0;
+byte einde = 0;
+int randNumber = 0;
+
+void setup() {
+
+  Serial.begin(57600);                                                                  // start de seriele monitor op met een baut-rate van 57600
+
+  delay(300);                                                                           // delay zodat de controller kan opstarten
+
+  error = ps2x.config_gamepad(PS2_CLK, PS2_CMD, PS2_SEL, PS2_DAT, pressures, rumble);   // start de PS-controller op d.m.v. de meegegeven pinnen en instellingen
+
+  if (error == 0) {                                                                     // als het gelukt is om de PS-controller op te starten wordt dit zichtbaar op de Serial monitor
+    Serial.print("Found Controller, configured successful ");
+  }
+  // stel de pinnen voor de cijfers via een for loop als output
+  for (byte i = 0; i < sizeof(pinnenWeg); i++) {
+    pinMode(pinnenWeg[i], OUTPUT);
+  }
+  for (int i = 0; i < sizeof(NUL); i++) {
+    pinMode(NUL[i], OUTPUT);
+  }
+  for (int i = 0; i < sizeof(EEN); i++) {
+    pinMode(NUL[i], OUTPUT);
+  }
+  for (int i = 0; i < sizeof(TWEE); i++) {
+    pinMode(NUL[i], OUTPUT);
+  }
+  for (int i = 0; i < sizeof(DRIE); i++) {
+    pinMode(NUL[i], OUTPUT);
+  }
+  for (int i = 0; i < sizeof(VIER); i++) {
+    pinMode(NUL[i], OUTPUT);
+  }
+  for (int i = 0; i < sizeof(VIJF); i++) {
+    pinMode(NUL[i], OUTPUT);
+  }
+  for (int i = 0; i < sizeof(ZES); i++) {
+    pinMode(NUL[i], OUTPUT);
+  }
+  for (int i = 0; i < sizeof(ZEVEN); i++) {
+    pinMode(NUL[i], OUTPUT);
+  }
+  for (int i = 0; i < sizeof(ACHT); i++) {
+    pinMode(NUL[i], OUTPUT);
+  }
+  for (int i = 0; i < sizeof(NEGEN); i++) {
+    pinMode(NUL[i], OUTPUT);
+  }
+  randomSeed(analogRead(0));            // analoge ruis van de analoge input 0 zullen voor random nummers zorgen door de randomSeed opdracht
+  randNumber = random(10);              // kies een random nummer van 0 tot 3 dit nummer bepaal waar de boten zich zullen bevinden
+  Serial.println(randNumber);           // print het randomnumer op de serieele monitor
+  pinMode(47, OUTPUT);
+  pinMode(50, OUTPUT);
+  pinMode(input, INPUT);
+}
+
+void loop() {
+  // lees ofdat de vorige puzzel volbracht is
+  if (magWerken == 0) {
+    inputStand = digitalRead(input);
+
+    if (inputStand == HIGH) {
+      magWerken = 1;
+    }
+  }
+  // als de vorige puzzel volbracht is dan pas zal deze puzzel in werking treden
+  if (magWerken == 1) {
+    ps2x.config_gamepad(PS2_CLK, PS2_CMD, PS2_SEL, PS2_DAT, pressures, rumble);
+
+    int joystickY_as = ps2x.Analog(PSS_LY); // linkse Y as
+    int joystickX_as = ps2x.Analog(PSS_LX); // linkse X as
+    // als op start is gedrukt dan zal het spel pas kunnen werken
+    if (ps2x.Button(PSB_START)) {
+      start = 1;
+    }
+    // als start ingedrukt is geweest dan wordt er telkens gecontroleer of de juiste knop is indrukt
+    if (start == 1) {
+      if (((ps2x.Button(PSB_PAD_UP)) && (vooruit == 0)) or ((joystickY_as < 10) && (vooruit == 0))) {
+        Serial.println("omhoog");
+        vooruit++;
+      }
+      else if (((ps2x.Button(PSB_PAD_UP)) && (vooruit == 1)) or ((joystickY_as < 10) && (vooruit == 1))) {
+        Serial.println("omhoog");
+        vooruit++;
+      }
+      else if (((ps2x.Button(PSB_PAD_RIGHT)) && (vooruit == 2))  or ((joystickX_as > 245) && (vooruit == 2))) {
+        Serial.println("rechts");
+        vooruit++;
+      }
+      else if (((ps2x.Button(PSB_PAD_DOWN)) && (vooruit == 3))  or ((joystickY_as > 245) && (vooruit == 3))) {
+        Serial.println("onder");
+        vooruit++;
+      }
+      else if (((ps2x.Button(PSB_PAD_RIGHT)) && (vooruit == 4))  or ((joystickX_as > 245) && (vooruit == 4))) {
+        Serial.println("rechts");
+        vooruit++;
+      }
+      else if (((ps2x.Button(PSB_PAD_RIGHT)) && (vooruit == 5))  or ((joystickX_as > 245) && (vooruit == 5))) {
+        Serial.println("rechts");
+        vooruit++;
+      }
+      else if (((ps2x.Button(PSB_PAD_UP)) && (vooruit == 6)) or ((joystickY_as < 10) && (vooruit == 6))) {
+        Serial.println("omhoog");
+        vooruit++;
+      }
+      else if (((ps2x.Button(PSB_PAD_LEFT)) && (vooruit == 7))  or ((joystickX_as < 10) && (vooruit == 7))) {
+        Serial.println("links");
+        vooruit++;
+      }
+      else if (((ps2x.Button(PSB_PAD_UP)) && (vooruit == 8)) or ((joystickY_as < 10) && (vooruit == 8))) {
+        Serial.println("omhoog");
+        vooruit++;
+      }
+      else if (((ps2x.Button(PSB_PAD_RIGHT)) && (vooruit == 9))  or ((joystickX_as > 245) && (vooruit == 9))) {
+        Serial.println("rechts");
+        vooruit++;
+      }
+      else if (((ps2x.Button(PSB_PAD_RIGHT)) && (vooruit == 10))  or ((joystickX_as > 245) && (vooruit == 10))) {
+        Serial.println("rechts");
+        vooruit++;
+      }
+      else if (((ps2x.Button(PSB_PAD_DOWN)) && (vooruit == 11))  or ((joystickY_as > 245) && (vooruit == 11))) {
+        Serial.println("onder");
+        vooruit++;
+      }
+      else if (((ps2x.Button(PSB_PAD_DOWN)) && (vooruit == 12))  or ((joystickY_as > 245) && (vooruit == 12))) {
+        Serial.println("onder");
+        vooruit++;
+      }
+      else if (((ps2x.Button(PSB_PAD_DOWN)) && (vooruit == 13))  or ((joystickY_as > 245) && (vooruit == 13))) {
+        Serial.println("onder");
+        vooruit++;
+      }
+      else if (((ps2x.Button(PSB_PAD_RIGHT)) && (vooruit == 14))  or ((joystickX_as > 245) && (vooruit == 14))) {
+        Serial.println("rechts");
+        vooruit++;
+      }
+      else if (((ps2x.Button(PSB_PAD_UP)) && (vooruit == 15)) or ((joystickY_as < 10) && (vooruit == 15))) {
+        Serial.println("omhoog");
+        vooruit++;
+      }
+      else if (((ps2x.Button(PSB_PAD_UP)) && (vooruit == 16)) or ((joystickY_as < 10) && (vooruit == 16))) {
+        Serial.println("omhoog");
+        vooruit++;
+      }
+      else if (((ps2x.Button(PSB_PAD_UP)) && (vooruit == 17)) or ((joystickY_as < 10) && (vooruit == 17))) {
+        Serial.println("omhoog");
+        vooruit++;
+      }
+      else if (((ps2x.Button(PSB_PAD_UP)) && (vooruit == 18)) or ((joystickY_as < 10) && (vooruit == 18))) {
+        Serial.println("omhoog");
+        vooruit++;
+      }
+      // als er op een verkeerde knop wordt gedrukt wordt er een waarschuwings toon afgespeeld en wort er een fout bijgeteld
+      else if ((ps2x.Button(PSB_PAD_UP)) or (ps2x.Button(PSB_PAD_RIGHT)) or (ps2x.Button(PSB_PAD_LEFT)) or (ps2x.Button(PSB_PAD_DOWN)) or (joystickX_as > 245) or (joystickX_as < 10) or (joystickY_as > 245) or (joystickY_as < 10)) {
+        Serial.println("tone");
+        tone(52, 220, 500);
+        fouten++;
+      }
+    }
+    //controleer op het aantal fouten
+    if (fouten == 3) {
+      vooruit = 0;
+      for (int i = 0; i < sizeof(pinnenWeg); i++) {
+        digitalWrite(pinnenWeg[i], LOW);
+      }
+      fouten = 0;
+    }
+    // zet pin hoog zodat de volgende puzzel in actie kan treden
+    if (einde == 1) {
+      cijfer(randNumber);
+      digitalWrite(50, HIGH);
+      delay(200);
+    }
+    //stuur het random nummer door naar het codeslot op het einde
+    if ((start == 2) && (einde == 1)) {
+      for (int i = 0; i < randNumber; i++) {
+        digitalWrite(47, HIGH);
+        delay(1000);
+        digitalWrite(47, LOW);
+        delay(1000);
+      }
+      start = -1;
+    }
+    //laat de het ledje pinken
+    ledKnipperen(vooruit, start);
+    delay(200);
+  }
+}
+// methode die ervoor zorgt dat het juist ledje pinkt waar je aanwezig bent
+int ledState = LOW;
+const long interval = 400;
+unsigned long previousMillis = 0;
+
+void ledKnipperen(int voor, int enable) {
+  int Stop = 0;
+  if (enable >= 1) {
+    if  (voor != 0) {
+      digitalWrite(pinnenWeg[voor - 1], HIGH);
+    }
+    if (voor == 19) {
+      digitalWrite(pinnenWeg[voor], HIGH);
+      Stop = 1;
+      speelLied(52);
+      for (int i = 0; i < sizeof(pinnenWeg); i++) {
+        digitalWrite(pinnenWeg[i], LOW);
+        delay(200);
+      }
+      vooruit = 0;
+      fouten = 0;
+      start = 2;
+      einde = 1;
+    }
+    if (Stop == 0) {
+      unsigned long currentMillis = currentMillis = millis();
+
+      if (currentMillis - previousMillis >= interval) {
+        previousMillis = currentMillis;
+
+        if (ledState == LOW) {
+          ledState = HIGH;
+        } else {
+          ledState = LOW;
+        }
+        digitalWrite(pinnenWeg[voor], ledState);
+
+      }
+    }
+  }
+}
+// methode die ervoor zorgt dat er op het einde een cijfer op het bord wordt geplaatst
+void cijfer(int cijfer) {
+  for (int i = 0; i < 13; i++) {
+    digitalWrite(CIJFERS[cijfer][i], HIGH);
+    delay(200);
+  }
+}
+
+// mehtode die zorgt voor het spelen van het liedje op het einde
+void speelLied(int pin) {
+  tone(pin, 880, 1000); //speel ole ole ole we are the champions
+  delay(800);
+  tone(pin, 1046, 1000); // zet een PWM signaal van 1046Hz gedurende 1s op pin 52
+  delay(800);
+  tone(pin, 880, 500);
+  delay(200);
+  tone(pin, 1046, 500);
+  delay(200);
+  tone(pin, 880, 500);
+  delay(200);
+  tone(pin, 1046, 500);
+  delay(200);
+  tone(pin, 880, 500);
+  delay(200);
+  tone(pin, 698, 1000);
+  delay(800);
+}</textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="personen-container">
+        <div class="personen-content">
+            <h2>Flowchart</h2>
+            <div class="personen">
+                <img src="./img/flowchart.png" alt="Foto van de flowchart">
+            </div>
+            <div>
+                <a class="button" href="#top">Back to top</a>
+            </div>
+
+        </div>
+    </div>
+
+
+</main>
+</body>
+</html>
